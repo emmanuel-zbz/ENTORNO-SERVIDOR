@@ -66,9 +66,12 @@ public class FabricantesServlet extends HttpServlet {
 			String[] pathParts = pathInfo.split("/");
 			
 			if (pathParts.length == 2 && "crear".equals(pathParts[1])) {
-				
+				FabricanteDAO fabDAO = new FabricanteDAOImpl();
+
 				// GET
 				// /fabricantes/crear
+
+				request.setAttribute("listaFabricantes", fabDAO.getAll());
 				dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/fabricantes/crear-fabricante.jsp");
 
 			} else if (pathParts.length == 2) {

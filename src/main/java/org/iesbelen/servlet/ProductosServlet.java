@@ -6,6 +6,8 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.iesbelen.dao.FabricanteDAO;
+import org.iesbelen.dao.FabricanteDAOImpl;
 import org.iesbelen.dao.ProductoDAO;
 import org.iesbelen.dao.ProductoDAOImpl;
 import org.iesbelen.model.Producto;
@@ -56,10 +58,13 @@ public class ProductosServlet extends HttpServlet {
 			String[] pathParts = pathInfo.split("/");
 			
 			if (pathParts.length == 2 && "crear".equals(pathParts[1])) {
+				FabricanteDAO fabDAO = new FabricanteDAOImpl();
 				
 				// GET
 				// /productos/crear
-				dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/crear-producto.jsp");
+
+				request.setAttribute("listaFabricantes", fabDAO.getAll());
+				dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/productos/crear-producto.jsp");
         												
 			
 			} else if (pathParts.length == 2) {
@@ -108,15 +113,18 @@ public class ProductosServlet extends HttpServlet {
 			throws ServletException, IOException {
 		
 		RequestDispatcher dispatcher;
-		String __method__ = request.getMethod();
-		
+		String __method__ = request.getParameter("__method__");
 		if (__method__ == null) {
 			// Crear uno nuevo
 			ProductoDAO fabDAO = new ProductoDAOImpl();
 			
 			String nombre = request.getParameter("nombre");
+			double precio = Double.parseDouble(request.getParameter("precio"));
+			int idFabricante = Integer.parseInt(request.getParameter("id-fabricante"));
 			Producto nuevoFab = new Producto();
 			nuevoFab.setNombre(nombre);
+			nuevoFab.setPrecio(precio);
+			nuevoFab.setCodigo_fabricante(idFabricante);
 			fabDAO.create(nuevoFab);			
 			
 		} else if (__method__ != null && "put".equalsIgnoreCase(__method__)) {			
