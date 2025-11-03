@@ -2,6 +2,7 @@ package org.iesbelen.servlet;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -75,8 +76,21 @@ public class FabricantesServlet extends HttpServlet {
 				// GET
 				// /fabricantes/{id}
 				try {
-					request.setAttribute("fabricante",fabDAO.find(Integer.parseInt(pathParts[1])));
-					dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/fabricantes/detalle-fabricante.jsp");
+					int id = Integer.parseInt(pathParts[1]);
+					Optional<Fabricante> optFabricante = fabDAO.find(id);
+					if (optFabricante.isPresent()){
+						Fabricante fabricante = optFabricante.get();
+						int countProductos = fabDAO.getCountProductos(id);
+
+						FabricanteDTO fabricanteDTO = new FabricanteDTO(fabricante.getIdFabricante(), fabricante.getNombre(), countProductos);
+						request.setAttribute("fabricante", fabricanteDTO);
+						dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/fabricantes/detalle-fabricante.jsp");
+					} else {
+						response.sendRedirect(request.getContextPath() + "/tienda/fabricantes");
+						return;
+					}
+
+
 
 				} catch (NumberFormatException nfe) {
 					nfe.printStackTrace();
